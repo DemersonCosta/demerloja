@@ -42,6 +42,7 @@
                $this->tpl->assign($key, $value);
             }
         } 
+
         public function setTpl($name, $data = array(), $returnHTML = false)
         {
            $this->setData($data);
@@ -51,7 +52,9 @@
 
         public function __destruct()
         {
+
             if($this->options["footer"]===true) $this->tpl->draw("footer");
+            
         }
 
     }
