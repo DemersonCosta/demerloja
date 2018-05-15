@@ -1,81 +1,113 @@
 <?php
 
-require_once("vendor/autoload.php");
+namespace Hcode;
 
-use PHPMailer\PHPMailer\PHPMailer;
-//Create a new PHPMailer instance
-$mail = new PHPMailer;
+use Rain\Tpl;
+use PHPMailer\PHPMailer\PHPMailer; 
 
-//Tell PHPMailer to use SMTP
-$mail->isSMTP();
+	class Mailer {
 
-$mail->SMTPOptions = array(
-    'ssl' => array(
-    'verify_peer' => false,
-    'verify_peer_name' => false,     
-    'allow_self_signed' => true
-    )
- );
+		const USERNAME = "demersontestephp@gmail.com";
+		const PASSWORD = "32358115";
+		const NAME_FROM = "demerloja";
 
-//Enable SMTP debugging
-// 0 = off (for production use)
-// 1 = client messages
-// 2 = client and server messages
-$mail->SMTPDebug = 2;
+		private $mail;		
 
-//Set the hostname of the mail server
-$mail->Host = 'smtp.gmail.com';
-// use
-// $mail->Host = gethostbyname('smtp.gmail.com');
-// if your network does not support SMTP over IPv6
+		function __construct($toAddress, $toName, $subject, $tplName, $data = array())
+		{
 
-//Set the SMTP port number - 587 for authenticated TLS, a.k.a. RFC4409 SMTP submission
-$mail->Port = 587;
+			  $config = array(
 
-//Set the encryption system to use - ssl (deprecated) or tls
-$mail->SMTPSecure = 'tls';
+                "tpl_dir"    => $_SERVER["DOCUMENT_ROOT"]."/views/email/",
+                "cache_dir"  => $_SERVER["DOCUMENT_ROOT"]."/views-cache/",
+                "debug"      => false
 
-//Whether to use SMTP authentication
-$mail->SMTPAuth = true;
+      		);
 
-//Username to use for SMTP authentication - use full email address for gmail
-$mail->Username = "demersontestephp@gmail.com";
+        Tpl::configure( $config );
 
-//Password to use for SMTP authentication
-$mail->Password = "32358115";
+       	$tpl = new Tpl;
 
-//Set who the message is to be sent from
-$mail->setFrom('demersontestephp@gmail.com', 'CURSO PHP');
+       	foreach ($data as $key => $value) {
+   		
+   			$tpl->assign($key, $value);
 
-//Set an alternative reply-to address
-//$mail->addReplyTo('replyto@example.com', 'First Last');
+   		}
 
-//Set who the message is to be sent to
-$mail->addAddress('demerson_pt@hotmail.com', 'TESTE John Doe');
+   		$html = $tpl->draw($tplName, true);
 
-//Set the subject line
-$mail->Subject = 'Demerson costa PHPMailer GMail SMTP test';
+		//################## Teste #############################
+	
+		//Create a new PHPMailer instance
+		$this->mail = new PHPMailer;
 
-//Read an HTML message body from an external file, convert referenced images to embedded,
-//convert HTML into a basic plain-text alternative body
-$mail->msgHTML(file_get_contents('contents.html'), __DIR__);
+		//Tell PHPMailer to use SMTP
+		$this->mail->isSMTP();
 
-//Replace the plain text body with one created manually
-$mail->AltBody = 'This is a plain-text message body';
+		$this->mail->SMTPOptions = array(
+		    'ssl' => array(
+		    'verify_peer' => false,
+		    'verify_peer_name' => false,     
+		    'allow_self_signed' => true
+		    )
+		 );
 
-//Attach an image file
-//$mail->addAttachment('images/phpmailer_mini.png');
+		//Enable SMTP debugging
+		// 0 = off (for production use)
+		// 1 = client messages
+		// 2 = client and server messages
+		$this->mail->SMTPDebug = 0;
 
-//send the message, check for errors
-if (!$mail->send()) {
-    echo "Mailer Error: " . $mail->ErrorInfo;
-} else {
-    echo "Message sent!";
-    //Section 2: IMAP
-    //Uncomment these to save your message in the 'Sent Mail' folder.
-    #if (save_mail($mail)) {
-    #    echo "Message saved!";
-    #}
-}
+		//Set the hostname of the mail server
+		$this->mail->Host = 'smtp.gmail.com';
+		// use
+		// $mail->Host = gethostbyname('smtp.gmail.com');
+		// if your network does not support SMTP over IPv6
+
+		//Set the SMTP port number - 587 for authenticated TLS, a.k.a. RFC4409 SMTP submission
+		$this->mail->Port = 587;
+
+		//Set the encryption system to use - ssl (deprecated) or tls
+		$this->mail->SMTPSecure = 'tls';
+
+		//Whether to use SMTP authentication
+		$this->mail->SMTPAuth = true;
+
+		//Username to use for SMTP authentication - use full email address for gmail
+		$this->mail->Username = Mailer::USERNAME;
+
+		//Password to use for SMTP authentication
+		$this->mail->Password = Mailer::PASSWORD;
+
+		//Set who the message is to be sent from
+		$this->mail->setFrom(Mailer::USERNAME, Mailer::NAME_FROM);
+
+		//Set an alternative reply-to address
+		//$this->$mail->addReplyTo('replyto@example.com', 'First Last');
+
+		//Set who the message is to be sent to
+		$this->mail->addAddress($toAddress, $toName);
+
+		//Set the subject line
+		$this->mail->Subject = $subject;
+
+		//Read an HTML message body from an external file, convert referenced images to embedded,
+		//convert HTML into a basic plain-text alternative body
+		$this->mail->msgHTML($html);
+
+		//Replace the plain text body with one created manually
+		$this->mail->AltBody = 'This is a plain-text message body';
+
+		}
+		//Attach an image file
+		//$mail->addAttachment('images/phpmailer_mini.png');
+
+		//send the message, check for errors
+		public function send()
+		{
+			return $this->mail->send();
+		}
+
+	}	
 
 ?>

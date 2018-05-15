@@ -4,6 +4,8 @@ namespace Hcode\Model;
 
 use \Hcode\DB\Sql;
 use \Hcode\Model;
+use Hcode\Mailer;
+
 
 
 class User extends Model{
@@ -21,8 +23,8 @@ class User extends Model{
 
         if (count($results) === 0) 
         {
-             
-            throw new \Exception("Usuário inexistente ou senha inválida.");
+
+            throw new \Exception("Usuário inexistente ou senha inválida. 2");
 
         }
 
@@ -42,7 +44,7 @@ class User extends Model{
 
         }else{
 
-            throw new \Exception("Usuário inexistente ou senha inválida.");
+            throw new \Exception("Usuário inexistente ou senha inválida. 1");
             
         }
     }
@@ -85,7 +87,7 @@ class User extends Model{
         $results = $sql->select("CALL sp_users_save(:desperson, :deslogin, :despassword, :desemail, :nrphone, :inadmin)", array(
             ":desperson"=>$this->getdesperson(),
             ":deslogin"=>$this->getdeslogin(),
-            ":despassword"=>$this->getdespassword(),
+            ":despassword"=>password_hash($this->getdespassword(), PASSWORD_DEFAULT),
             ":desemail"=>$this->getdesemail(),
             ":nrphone"=>$this->getnrphone(),
             ":inadmin"=>$this->getinadmin()
@@ -174,10 +176,9 @@ class User extends Model{
 
                 $code = base64_encode(mcrypt_encrypt(MCRYPT_RIJNDAEL_128, User::SECRET, $dataRecovery["idrecovery"], MCRYPT_MODE_ECB));
 
-                $link = "http://http://www.targaryen.master.com/admin/forgot/reset?code=$code";
+                $link = "http://www.targaryen.master.com/admin/forgot/reset?code=$code";
 
-                $mailer = new Mailer($data["deemail"],$data["desperson"], "Redefinir Senha da demerloja Store", "forgot", array(
-
+                $mailer = new Mailer($data["desemail"], $data["desperson"], "Redefinir Senha da demerloja Store", "forgot", array(
                     "name"=>$data["desperson"],
                     "link"=>$link
                 ));
