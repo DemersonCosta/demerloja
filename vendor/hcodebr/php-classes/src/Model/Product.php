@@ -19,7 +19,7 @@ class Product extends Model {
      }  
 
      public static function checkList($List)
-     {
+    {
         foreach ($List as &$row) {
           
           $p = new Product();
@@ -27,7 +27,7 @@ class Product extends Model {
           $row = $p->getValues();
         }
         return $List;
-     }
+    }
 
     public function save()
     {
