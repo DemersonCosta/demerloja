@@ -13,6 +13,48 @@ class User extends Model {
 	const SESSION = "User";
     const SECRET = "HcodePhp7_Secret";
 
+    public static function getFromSession(){
+
+        $user = new User();
+
+        if(isset($_SESSION[User::SESSION])&& (int)$_SESSION[User::SESSION]['iduser']>0)
+        {
+            $user->setData($_SESSION[User::SESSION]);
+            return $user;
+        }
+
+        return $user;
+    }
+
+    public static function checkLogin($inadmin = true)
+    {
+        if (
+            !isset($_SESSION[User::SESSION]) 
+            || 
+            !$_SESSION[User::SESSION]
+            ||
+            !(int)$_SESSION[User::SESSION]["iduser"] > 0
+        )  {
+
+            return false;
+
+        } else {
+
+            if ($inadmin === true && (bool)$_SESSION[User::SESSION]['inadmin'] === true) {
+               
+               return true;
+
+            }else if ($inadmin === false) {
+                
+                return true;
+
+            }else{
+
+                return true;
+            }
+        }
+    }
+
     public static function login($login, $password)
     {
         $sql = new Sql();
@@ -36,7 +78,7 @@ class User extends Model {
             $user = new User();            
 
             $user->setData($data);
-
+            
             $_SESSION[User::SESSION] = $user->getValues();
 
           	return $user;
@@ -50,20 +92,26 @@ class User extends Model {
     }
     public static function verifyLogin($inadmin = true)
     {
-    	if (
-    		!isset($_SESSION[User::SESSION]) 
-    		|| 
-    		!$_SESSION[User::SESSION]
-    		||
-    		!(int)$_SESSION[User::SESSION]["iduser"] > 0
-    		||
-    		(bool)$_SESSION[User::SESSION]["inadmin"] !== $inadmin
-    	) {
+        /*!isset($_SESSION[User::SESSION])
+            || 
+            !$_SESSION[User::SESSION]
+            ||
+            !(int)$_SESSION[User::SESSION]['iduser'] > 0
+            ||
+            (bool)$_SESSION[User::SESSION]['inadmin'] !== $inadmin*/
+        //User::checkLogin($inadmin)
+        if (!User::checkLogin($inadmin)) {
 
-    		header("Location: /admin/login");
+            if ($inadmin){
 
-    		exit;
-    	}
+               header("Location: /admin/login");
+            } else {
+
+               header("Location: /login");
+            }
+            exit();
+        }
+    
     }
 
     public static function logout()
