@@ -6,8 +6,6 @@ use \Hcode\DB\Sql;
 use \Hcode\Model;
 use Hcode\Mailer;
 
-
-
 class User extends Model {
 
 	const SESSION = "User";
@@ -17,7 +15,7 @@ class User extends Model {
 
         $user = new User();
 
-        if(isset($_SESSION[User::SESSION])&& (int)$_SESSION[User::SESSION]['iduser']>0)
+        if(isset($_SESSION[User::SESSION])&& (int)$_SESSION[User::SESSION]['iduser'] > 0)
         {
             $user->setData($_SESSION[User::SESSION]);
             return $user;
